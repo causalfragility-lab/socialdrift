@@ -1,0 +1,16 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+inst/doc
+/doc/
+/Meta/
+man/*.Rd.bak
+NAMESPACE.bak
+*.tar.gz
+*.o
+*.so
+*.dll
+.DS_Store
+Thumbs.db

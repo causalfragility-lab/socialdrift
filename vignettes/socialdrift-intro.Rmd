@@ -1,0 +1,212 @@
+---
+title: "Introduction to socialdrift"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to socialdrift}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 7,
+  fig.height = 4,
+  message  = FALSE,
+  warning  = FALSE
+)
+```
+
+## Overview
+
+**socialdrift** provides a complete workflow for turning raw social interaction
+event logs into longitudinal network diagnostics. It is designed for
+computational social scientists, digital community managers, and platform
+analysts who want to track *how* a network changes --- not just what it looks
+like at a single moment.
+
+The package is built around four signature indices:
+
+| Index | Symbol | What it measures |
+|-------|--------|-----------------|
+| Network Drift Index | **NDI** | Structural change between periods |
+| Community Fragmentation Index | **CFI** | Degree of silo formation |
+| Visibility Concentration Index | **VCI** | Concentration of incoming attention |
+| Role Mobility Index | **RMI** | Frequency of role transitions |
+
+---
+
+## 1. Prepare event data
+
+The base input is a tidy data frame with one row per interaction event.
+
+```{r load}
+library(socialdrift)
+data(sim_social_events)
+head(sim_social_events)
+```
+
+Convert to a standardized `social_events` object:
+
+```{r as_events}
+ev <- as_social_events(
+  sim_social_events,
+  actor_group  = "actor_group",
+  target_group = "target_group"
+)
+```
+
+---
+
+## 2. Build a monthly graph series
+
+```{r graph_series}
+gs <- build_graph_series(ev, window = "month")
+gs   # print method shows summary
+```
+
+---
+
+## 3. Structural metrics
+
+```{r metrics}
+summarize_network_series(gs)
+```
+
+Plot density over time:
+
+```{r plot_density}
+dens_tbl <- network_density_ts(gs)
+plot_network_metrics(dens_tbl, metric = "density",
+                     title = "Monthly network density")
+```
+
+Plot all four metrics together:
+
+```{r plot_all, fig.height = 6}
+all_metrics <- summarize_network_series(gs)
+plot_network_metrics(
+  all_metrics,
+  metric = c("density", "reciprocity", "clustering", "degree_gini"),
+  title  = "Network structure over time"
+)
+```
+
+---
+
+## 4. Community dynamics
+
+```{r communities}
+comm_tbl <- detect_communities_ts(gs)
+comm_tbl
+```
+
+Community drift (period-over-period changes):
+
+```{r comm_drift}
+drift_comm <- community_drift(comm_tbl)
+drift_comm
+```
+
+Community Fragmentation Index:
+
+```{r cfi}
+community_fragmentation_index(comm_tbl)
+```
+
+---
+
+## 5. Network Drift Index (NDI)
+
+The NDI combines edge turnover, degree shift, modularity change, and
+centralization change into a single composite score.
+
+```{r ndi}
+ndi_tbl <- network_drift(gs)
+ndi_tbl
+```
+
+```{r plot_ndi}
+plot_network_drift(ndi_tbl)
+```
+
+---
+
+## 6. User role trajectories
+
+Each node is classified into one of six structural roles:
+`isolated`, `peripheral`, `broadcaster`, `popular`, `core`, `bridge`.
+
+```{r roles}
+roles_tbl <- role_trajectories(gs)
+head(roles_tbl, 12)
+```
+
+```{r plot_roles}
+plot_role_trajectories(roles_tbl, type = "stacked")
+```
+
+Role Mobility Index:
+
+```{r rmi}
+role_mobility_index(roles_tbl)
+```
+
+---
+
+## 7. Visibility & inequality
+
+```{r vci}
+visibility_concentration_index(gs)
+```
+
+Creator concentration (Gini + top-10% share):
+
+```{r conc}
+creator_concentration(gs, p = 0.10)
+```
+
+---
+
+## 8. Group disparity audit
+
+If your event data includes group membership, you can audit structural
+disparities across groups over time.
+
+```{r disparities}
+audit_group_disparities(ev, gs, group_var = "actor_group", window = "month")
+```
+
+Engagement gap between groups:
+
+```{r gap}
+engagement_gap(ev, gs, group_var = "actor_group", window = "month")
+```
+
+---
+
+## Summary
+
+A typical full audit in fewer than 15 lines:
+
+```{r full_workflow, eval = FALSE}
+library(socialdrift)
+
+ev <- as_social_events(sim_social_events,
+                       actor_group  = "actor_group",
+                       target_group = "target_group")
+
+gs       <- build_graph_series(ev, window = "month")
+summary  <- summarize_network_series(gs)
+ndi      <- network_drift(gs)
+comm     <- detect_communities_ts(gs)
+cfi      <- community_fragmentation_index(comm)
+vci      <- visibility_concentration_index(gs)
+roles    <- role_trajectories(gs)
+rmi      <- role_mobility_index(roles)
+gaps     <- audit_group_disparities(ev, gs)
+
+plot_network_drift(ndi)
+plot_role_trajectories(roles)
+```

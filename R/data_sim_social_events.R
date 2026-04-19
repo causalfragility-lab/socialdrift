@@ -1,0 +1,40 @@
+#' Simulated social interaction event log
+#'
+#' A synthetic dataset of 591 user-to-user interaction events spanning
+#' January through June 2025. Designed for demonstrating the
+#' \pkg{socialdrift} workflow. Includes group membership columns for
+#' disparity analyses.
+#'
+#' @name sim_social_events
+#' @docType data
+#' @usage NULL
+#' @keywords datasets
+#'
+#' @format A data frame with 591 rows and 7 variables:
+#' \describe{
+#'   \item{actor_id}{Source user ID (character, \code{"u1"} to \code{"u60"}).}
+#'   \item{target_id}{Target user ID (character).}
+#'   \item{timestamp}{Event timestamp (POSIXct, UTC).}
+#'   \item{event_type}{Type of interaction: \code{"follow"}, \code{"reply"},
+#'     \code{"mention"}, \code{"like"}, or \code{"repost"}.}
+#'   \item{weight}{Interaction weight (integer, always 1 in this dataset).}
+#'   \item{actor_group}{Group membership of the actor:
+#'     \code{"A"}, \code{"B"}, or \code{"C"}.}
+#'   \item{target_group}{Group membership of the target:
+#'     \code{"A"}, \code{"B"}, or \code{"C"}.}
+#' }
+#'
+#' @details
+#' The dataset was generated with preferential attachment: earlier-indexed
+#' users have slightly higher probability of being selected as targets,
+#' creating realistic degree inequality. Event types are sampled with
+#' probabilities approximating typical social platform distributions.
+#'
+#' @source Simulated data. See \code{data-raw/sim_social_events.R} for the
+#'   generation script.
+#'
+#' @examples
+#' data(sim_social_events)
+#' head(sim_social_events)
+#' table(sim_social_events$event_type)
+"sim_social_events"
