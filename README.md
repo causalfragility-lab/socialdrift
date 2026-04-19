@@ -19,6 +19,7 @@ reports, and inequality audits.
 ```r
 # Install from GitHub (development version)
 # install.packages("remotes")
+remotes::install_github("causalfragility-lab/socialdrift")
 ```
 
 ---
