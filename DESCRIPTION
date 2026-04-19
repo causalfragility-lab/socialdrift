@@ -18,6 +18,8 @@ Description: Tools for constructing, auditing, and visualizing temporal
     Visibility Concentration Index ('VCI'), and Role Mobility Index ('RMI').
     'NDI', 'CFI', 'VCI', and 'RMI' are purpose-built composite scores for longitudinal platform auditing.
 License: GPL-3
+URL: https://github.com/causalfragility-lab/socialdrift
+BugReports: https://github.com/causalfragility-lab/socialdrift/issues
 Encoding: UTF-8
 Depends:
     R (>= 4.1.0)
