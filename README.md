@@ -112,7 +112,7 @@ Each node is assigned one of six interpretable roles per period:
 @Manual{socialdrift,
   title  = {socialdrift: Temporal Auditing of Social Interaction Networks},
   author = {Subir Hait},
-  year   = {2025},
+  year   = {2026},
   note   = {R package version 0.1.0},
 }
 ```
